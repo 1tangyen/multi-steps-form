@@ -1,0 +1,42 @@
+ID,Country,City,Date,Restaurant,Tried
+1,USA,New York,2022-01-15,Restaurant A,Tried
+2,USA,Los Angeles,2022-02-20,Restaurant B,Not Tried
+3,USA,Chicago,2022-03-10,Restaurant A,Tried
+4,USA,Houston,2022-04-05,Restaurant C,Tried
+5,USA,Philadelphia,2022-05-15,Restaurant B,Not Tried
+6,USA,Phoenix,2022-06-20,Restaurant A,Not Tried
+7,USA,San Antonio,2022-07-10,Restaurant C,Tried
+8,USA,San Diego,2022-08-05,Restaurant B,Tried
+9,USA,Dallas,2022-09-15,Restaurant A,Not Tried
+10,USA,San Jose,2022-10-20,Restaurant C,Tried
+11,Canada,Toronto,2022-01-25,Restaurant A,Tried
+12,Canada,Calgary,2022-02-15,Restaurant B,Not Tried
+13,Canada,Vancouver,2022-03-30,Restaurant C,Not Tried
+14,Canada,Montreal,2022-04-10,Restaurant A,Tried
+15,Canada,Edmonton,2022-05-05,Restaurant B,Tried
+16,Canada,Ottawa,2022-06-25,Restaurant C,Not Tried
+17,UK,London,2022-01-10,Restaurant A,Tried
+18,UK,Manchester,2022-02-08,Restaurant B,Tried
+19,UK,Birmingham,2022-03-05,Restaurant C,Not Tried
+20,UK,Glasgow,2022-04-15,Restaurant A,Not Tried
+21,UK,Liverpool,2022-05-20,Restaurant B,Tried
+22,Germany,Berlin,2022-01-12,Restaurant C,Not Tried
+23,Germany,Munich,2022-02-22,Restaurant A,Tried
+24,Germany,Hamburg,2022-03-18,Restaurant B,Not Tried
+25,Germany,Cologne,2022-04-08,Restaurant C,Tried
+26,Germany,Stuttgart,2022-05-25,Restaurant A,Tried
+27,Australia,Sydney,2022-01-03,Restaurant B,Not Tried
+28,Australia,Melbourne,2022-02-14,Restaurant C,Tried
+29,Australia,Brisbane,2022-03-12,Restaurant A,Tried
+30,Australia,Perth,2022-04-02,Restaurant B,Not Tried
+31,Australia,Adelaide,2022-05-30,Restaurant C,Tried
+32,France,Paris,2022-01-07,Restaurant A,Tried
+33,France,Marseille,2022-02-24,Restaurant B,Not Tried
+34,France,Lyon,2022-03-22,Restaurant C,Not Tried
+35,France,Toulouse,2022-04-12,Restaurant A,Tried
+36,France,Nice,2022-05-10,Restaurant B,Tried
+37,Italy,Rome,2022-01-20,Restaurant C,Not Tried
+38,Italy,Milan,2022-02-16,Restaurant A,Tried
+39,Italy,Naples,2022-03-28,Restaurant B,Tried
+40,Italy,Turin,2022-04-22,Restaurant C,Not Tried
+41,Italy,Florence,2022-05-02,Restaurant A,Not Tried

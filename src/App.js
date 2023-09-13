@@ -2,7 +2,7 @@ import FormContainer from "./FormContainer";
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <FormContainer />
     </div>
   );

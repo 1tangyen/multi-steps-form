@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
+import { Container, Row, Col, Form, Button } from "react-bootstrap"; // Import React Bootstrap components
 
-function Step1({ initialValues, onSubmit, onReset }) {
+function Step1({ initialValues, onSubmit, onReset, active }) {
   const [country, setCountry] = useState(initialValues.country);
   const [city, setCity] = useState(initialValues.city);
   const [filteredData, setFilteredData] = useState([]);
@@ -106,73 +107,64 @@ function Step1({ initialValues, onSubmit, onReset }) {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-3">Step 1</h2>
-      <p className="text-muted">
-        You can choose either or both of the following inputs: Country and City.
-      </p>
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label htmlFor="countrySelect" className="form-label">
-            Select Country:
-          </label>
-          <select
-            id="countrySelect"
-            className="form-select"
-            value={country}
-            onChange={handleCountryChange}
+    // Conditionally render the component based on the 'active' prop
+    active && (
+      <Container className="mt-4">
+        <h2 className="mb-3">Step 1</h2>
+        <p className="text-muted">
+          You can choose either or both of the following inputs: Country and
+          City.
+        </p>
+        <Row className="mb-3">
+          <Col md={6}>
+            <Form.Group controlId="countrySelect">
+              <Form.Label>Select Country:</Form.Label>
+              <Form.Select value={country} onChange={handleCountryChange}>
+                <option value="">All</option>
+                {uniqueCountries.map((countryName) => (
+                  <option
+                    key={generateUniqueKey(countryName, "country")}
+                    value={countryName}
+                  >
+                    {countryName}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="citySelect">
+              <Form.Label>Select City:</Form.Label>
+              <Form.Select value={city} onChange={handleCityChange}>
+                <option value="">All</option>
+                {uniqueCities.map((cityName) => (
+                  <option
+                    key={generateUniqueKey(cityName, "city")}
+                    value={cityName}
+                  >
+                    {cityName}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+        <div className="d-flex justify-content-center">
+          <Button
+            type="button"
+            variant="outline-danger"
+            className="me-3"
+            disabled={!country && !city}
+            onClick={handleReset}
           >
-            <option value="">All</option>
-            {uniqueCountries.map((countryName) => (
-              <option
-                key={generateUniqueKey(countryName, "country")}
-                value={countryName}
-              >
-                {countryName}
-              </option>
-            ))}
-          </select>
+            Reset
+          </Button>
+          <Button type="button" variant="outline-danger" onClick={handleSubmit}>
+            Submit
+          </Button>
         </div>
-        <div className="col-md-6">
-          <label htmlFor="citySelect" className="form-label">
-            Select City:
-          </label>
-          <select
-            id="citySelect"
-            className="form-select"
-            value={city}
-            onChange={handleCityChange}
-          >
-            <option value="">All</option>
-            {uniqueCities.map((cityName) => (
-              <option
-                key={generateUniqueKey(cityName, "city")}
-                value={cityName}
-              >
-                {cityName}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <div className="d-flex justify-content-center">
-        <button
-          type="button"
-          className="btn btn-outline-danger me-3"
-          disabled={!country && !city}
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-        <button
-          type="button"
-          className="btn btn-outline-danger "
-          onClick={handleSubmit}
-        >
-          Submit
-        </button>
-      </div>
-    </div>
+      </Container>
+    )
   );
 }
 

@@ -1,111 +1,45 @@
 import React, { useState } from "react";
+import { Stepper, Step } from "react-form-stepper";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import Step3 from "./Step3";
 
-function FormContainer() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    country: "",
-    city: "",
-    period: "",
-  });
-  const [isInputSelected, setIsInputSelected] = useState(false);
+export default function FormContainer() {
+  const [goSteps, setGoSteps] = useState(0);
 
-  const handleFormSubmit = (data) => {
-    setFormData({ ...formData, ...data });
-    if (currentStep < 3) {
-      setCurrentStep((prevStep) => prevStep + 1);
-    }
-    // Check if any input is selected
-    setIsInputSelected(Object.values(data).some((value) => !!value));
+  // Define initial values for Step1
+  const initialValuesStep1 = {
+    country: "", // Set initial country value here
+    city: "", // Set initial city value here
   };
-
-  const handleFormReset = () => {
-    setFormData({
-      country: "",
-      city: "",
-      period: "",
-    });
-    setCurrentStep(1);
-    setIsInputSelected(false);
-  };
-
-  const containerStyle = {
-    backgroundColor: "#f9f9fb", // Background color
-    padding: "30px", // Padding for inner content
-    borderRadius: "10px", // Rounded corners
-    boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.2)", // Box shadow for the container
-    width: "100%", // Width of the container
-    height: "100vh", // Full viewport height
-    margin: "0 auto", // Center the container horizontally
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
-  const stepTitles = [
-    "Step 1: Choose Location",
-    "Step 2: Choose Period",
-    "Step 3: Review & Submit",
-  ];
 
   return (
-    <div className="container-fluid p-0" style={{ backgroundColor: "#fff" }}>
-      <div className="d-flex justify-content-center align-items-center vh-100">
-        <div className="p-4 rounded" style={containerStyle}>
-          <h2 className="mb-4">{stepTitles[currentStep - 1]}</h2>
-          <div className="progress mb-4">
-            <div
-              className={`progress-bar bg-primary`}
-              role="progressbar"
-              style={{ width: `${(currentStep - 1) * 50}%` }}
-            ></div>
+    <div>
+      <Stepper activeStep={goSteps}>
+        <Step onClick={() => setGoSteps(0)} label="Choose Location" />
+        <Step onClick={() => setGoSteps(1)} label="Choose Period" />
+        <Step onClick={() => setGoSteps(2)} label="Review & Submit" />
+      </Stepper>
+      {goSteps === 0 && (
+        <div>
+          <div>
+            {/* Pass 'active' prop as true and 'initialValues' prop to Step1 */}
+            <Step1 active={true} initialValues={initialValuesStep1} />
           </div>
-          {currentStep === 1 && (
-            <Step1
-              initialValues={formData}
-              onSubmit={handleFormSubmit}
-              onReset={handleFormReset}
-            />
-          )}
-          {currentStep === 2 && (
-            <Step2
-              initialValues={formData}
-              onSubmit={handleFormSubmit}
-              setIsInputSelected={setIsInputSelected}
-            />
-          )}
-          {currentStep === 3 && (
-            <Step3 data={formData} onSubmit={handleFormSubmit} />
-          )}
-          {currentStep > 1 && (
-            <div className="d-flex justify-content-between mt-4">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setCurrentStep(currentStep - 1)}
-              >
-                Previous
-              </button>
-              {currentStep < 3 && (
-                <button
-                  type="button"
-                  className={`btn btn-primary ${
-                    !isInputSelected ? "disabled" : ""
-                  }`}
-                  onClick={() => setCurrentStep(currentStep + 1)}
-                >
-                  Next
-                </button>
-              )}
-            </div>
-          )}
         </div>
-      </div>
+      )}
+      {goSteps === 1 && (
+        <div>
+          Addreess
+          <button onClick={() => setGoSteps(2)}>Next</button>
+        </div>
+      )}
+      {goSteps === 2 && (
+        <div>
+          Payment
+          <button onClick={() => setGoSteps(3)}>Submit</button>
+        </div>
+      )}
     </div>
   );
 }
-
-export default FormContainer;

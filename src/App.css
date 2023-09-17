@@ -1,0 +1,7 @@
+/* Step1.css */
+.custom-dropdown {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gray;
+}

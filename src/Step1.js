@@ -340,7 +340,7 @@
 
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
-import { Container, Form, ListGroup, Button } from "react-bootstrap";
+import { Container, Form, ListGroup, Button, Row, Col } from "react-bootstrap";
 
 function Step1({ onSubmit }) {
   const [filteredData, setFilteredData] = useState([]);
@@ -469,68 +469,76 @@ function Step1({ onSubmit }) {
 
   return (
     <Container className="mt-4">
+      <h4 className="mb-4">Step 1: Choose One or Both</h4>
       <Form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <Form.Label htmlFor="countrySearch" className="form-label">
-            Enter a country name:
-          </Form.Label>
-          <Form.Control
-            type="text"
-            className={`form-control ${countryError ? "is-invalid" : ""}`}
-            id="countrySearch"
-            placeholder="Country"
-            value={country}
-            onChange={handleCountrySearch}
-          />
-        </div>
-        <div className="mb-3">
-          <Form.Label htmlFor="citySearch" className="form-label">
-            Enter a city name:
-          </Form.Label>
-          <Form.Control
-            type="text"
-            className={`form-control ${cityError ? "is-invalid" : ""}`}
-            id="citySearch"
-            placeholder="City"
-            value={city}
-            onChange={handleCitySearch}
-          />
-        </div>
-        <div>
-          <h3>choose from:</h3>
-          {country || city ? (
-            filteredStep1Data.length === 0 ? (
-              <p>No results found.</p>
-            ) : selectedItem ? null : (
-              <ListGroup>
-                {filteredStep1Data.map((item, index) => (
-                  <ListGroup.Item
-                    key={index}
-                    action
-                    id={`checkbox-${index}`}
-                    active={item === selectedItem}
-                    onClick={() => handleItemSelect(item)}
-                  >
-                    {`Country: ${item.Country}, City: ${item.City}`}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            )
-          ) : null}
-        </div>
-        <div className="d-flex justify-content-center mt-3">
-          <Button type="submit" variant="danger" className="me-2">
-            Search
-          </Button>
-          <Button
-            type="button"
-            variant="danger"
-            onClick={handleReset}
-            disabled={!selectedItem}
-          >
-            Reset
-          </Button>
-        </div>
+        <Row className="justify-content-center">
+          <Col md={6}>
+            <div className="mb-5">
+              <Form.Label htmlFor="countrySearch" className="form-label">
+                Enter a country name:
+              </Form.Label>
+              <Form.Control
+                type="text"
+                className={`form-control mb-2 ${
+                  countryError ? "is-invalid" : ""
+                }`}
+                id="countrySearch"
+                placeholder="Country"
+                value={country}
+                onChange={handleCountrySearch}
+              />
+            </div>
+          </Col>
+          <Col md={6}>
+            <div className="mb-5">
+              <Form.Label htmlFor="citySearch" className="form-label">
+                Enter a city name:
+              </Form.Label>
+              <Form.Control
+                type="text"
+                className={`form-control mb-2 ${cityError ? "is-invalid" : ""}`}
+                id="citySearch"
+                placeholder="City"
+                value={city}
+                onChange={handleCitySearch}
+              />
+            </div>
+          </Col>
+          <div className="mb-5">
+            {country || city ? (
+              filteredStep1Data.length === 0 ? (
+                <p>No results found.</p>
+              ) : selectedItem ? null : (
+                <ListGroup>
+                  {filteredStep1Data.map((item, index) => (
+                    <ListGroup.Item
+                      key={index}
+                      action
+                      id={`checkbox-${index}`}
+                      active={item === selectedItem}
+                      onClick={() => handleItemSelect(item)}
+                    >
+                      {`Country: ${item.Country}, City: ${item.City}`}
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              )
+            ) : null}
+          </div>
+          <div className="d-flex justify-content-center mt-3">
+            <Button type="submit" variant="danger" className="me-2">
+              Search
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleReset}
+              disabled={!selectedItem}
+            >
+              Reset
+            </Button>
+          </div>
+        </Row>
       </Form>
     </Container>
   );

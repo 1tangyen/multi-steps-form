@@ -338,16 +338,226 @@
 
 //Manual input, with filtered result
 
+// import React, { useState, useEffect } from "react";
+// import Papa from "papaparse";
+// import { Container, Form, ListGroup, Button, Row, Col } from "react-bootstrap";
+
+// function Step1({ onSubmit }) {
+//   const [filteredData, setFilteredData] = useState([]);
+//   const [countryList, setCountryList] = useState([]);
+//   const [cityList, setCityList] = useState([]);
+//   const [country, setCountry] = useState("");
+//   const [city, setCity] = useState("");
+//   const [filteredStep1Data, setFilteredStep1Data] = useState([]);
+//   const [selectedItem, setSelectedItem] = useState(null); // Track selected item
+//   const [countryError, setCountryError] = useState(false);
+//   const [cityError, setCityError] = useState(false);
+
+//   useEffect(() => {
+//     // Fetch the CSV file asynchronously
+//     fetch("/example2.csv") // Adjust the path to the CSV file
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Network response was not ok");
+//         }
+//         return response.text();
+//       })
+//       .then((csvText) => {
+//         // Parse the CSV text using Papaparse
+//         Papa.parse(csvText, {
+//           header: true,
+//           dynamicTyping: true,
+//           complete: function (results) {
+//             if (results.data) {
+//               setFilteredData(results.data);
+
+//               const countries = [
+//                 ...new Set(results.data.map((row) => row.Country)),
+//               ];
+//               setCountryList(countries);
+
+//               const cities = [...new Set(results.data.map((row) => row.City))];
+//               setCityList(cities);
+//               console.log("CSV data loaded:", results.data);
+//             } else {
+//               console.error("CSV data parsing failed.");
+//             }
+//           },
+//           error: function (error) {
+//             console.error("CSV parsing error:", error.message);
+//           },
+//         });
+//       })
+//       .catch((error) => {
+//         console.error("Fetch error:", error);
+//       });
+//   }, []);
+
+//   useEffect(() => {
+//     // Update input fields when a selection is made
+//     if (selectedItem) {
+//       setCountry(selectedItem.Country);
+//       setCity(selectedItem.City);
+//     }
+//   }, [selectedItem]);
+
+//   const handleCountrySearch = (e) => {
+//     const searchTerm = e.target.value;
+//     setCountry(searchTerm);
+//     // Reset city input
+//     setCity("");
+//     setCityError(false); // Reset city error
+
+//     // Filter data based on selected country
+//     const filteredStep1 = filteredData.filter((row) =>
+//       row.Country.toLowerCase().startsWith(searchTerm.toLowerCase())
+//     );
+
+//     setFilteredStep1Data(filteredStep1);
+//   };
+
+//   const handleCitySearch = (e) => {
+//     const searchTerm = e.target.value;
+//     setCity(searchTerm);
+//     // Reset country input
+//     setCountry("");
+//     setCountryError(false); // Reset country error
+
+//     // Filter data based on selected city
+//     const filteredStep1 = filteredData.filter((row) =>
+//       row.City.toLowerCase().startsWith(searchTerm.toLowerCase())
+//     );
+//     setFilteredStep1Data(filteredStep1);
+//   };
+
+//   const handleItemSelect = (item) => {
+//     setSelectedItem(item); // Set the selected item
+//   };
+
+//   const handleReset = () => {
+//     setSelectedItem(null); // Reset the selected item
+//     setCity("");
+//     setCountry("");
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+
+//     // Gather selected options from checkboxes
+//     const selectedOptions = filteredStep1Data
+//       .filter((item, index) => {
+//         const checkbox = document.getElementById(`checkbox-${index}`);
+//         return checkbox && checkbox.checked;
+//       })
+//       .map((item) => ({
+//         Country: item.Country,
+//         City: item.City,
+//       }));
+
+//     // Validate country and city inputs
+//     if (!country && !city) {
+//       setCountryError(true);
+//       setCityError(true);
+//       return;
+//     }
+
+//     // You can perform further actions with the selected options here
+//     console.log("Selected Options:", selectedOptions);
+
+//     // Pass the selected options to the next step
+//     // onSubmit(selectedOptions);
+//   };
+
+//   return (
+//     <Container className="mt-4">
+//       <h4 className="mb-4">Step 1: Choose One or Both</h4>
+//       <Form onSubmit={handleSubmit}>
+//         <Row className="justify-content-center">
+//           <Col md={6}>
+//             <div className="mb-5">
+//               <Form.Label htmlFor="countrySearch" className="form-label">
+//                 Enter a country name:
+//               </Form.Label>
+//               <Form.Control
+//                 type="text"
+//                 className={`form-control mb-2 ${
+//                   countryError ? "is-invalid" : ""
+//                 }`}
+//                 id="countrySearch"
+//                 placeholder="Country"
+//                 value={country}
+//                 onChange={handleCountrySearch}
+//               />
+//             </div>
+//           </Col>
+//           <Col md={6}>
+//             <div className="mb-5">
+//               <Form.Label htmlFor="citySearch" className="form-label">
+//                 Enter a city name:
+//               </Form.Label>
+//               <Form.Control
+//                 type="text"
+//                 className={`form-control mb-2 ${cityError ? "is-invalid" : ""}`}
+//                 id="citySearch"
+//                 placeholder="City"
+//                 value={city}
+//                 onChange={handleCitySearch}
+//               />
+//             </div>
+//           </Col>
+//           <div className="mb-5">
+//             {country || city ? (
+//               filteredStep1Data.length === 0 ? (
+//                 <p>No results found.</p>
+//               ) : selectedItem ? null : (
+//                 <ListGroup>
+//                   {filteredStep1Data.map((item, index) => (
+//                     <ListGroup.Item
+//                       key={index}
+//                       action
+//                       id={`checkbox-${index}`}
+//                       active={item === selectedItem}
+//                       onClick={() => handleItemSelect(item)}
+//                     >
+//                       {`Country: ${item.Country}, City: ${item.City}`}
+//                     </ListGroup.Item>
+//                   ))}
+//                 </ListGroup>
+//               )
+//             ) : null}
+//           </div>
+//           <div className="d-flex justify-content-center mt-3">
+//             <Button type="submit" variant="danger" className="me-2">
+//               Search
+//             </Button>
+//             <Button
+//               type="button"
+//               variant="danger"
+//               onClick={handleReset}
+//               disabled={!selectedItem}
+//             >
+//               Reset
+//             </Button>
+//           </div>
+//         </Row>
+//       </Form>
+//     </Container>
+//   );
+// }
+
+// export default Step1;
+
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import { Container, Form, ListGroup, Button, Row, Col } from "react-bootstrap";
+import Select from "react-select";
 
 function Step1({ onSubmit }) {
   const [filteredData, setFilteredData] = useState([]);
   const [countryList, setCountryList] = useState([]);
   const [cityList, setCityList] = useState([]);
-  const [country, setCountry] = useState("");
-  const [city, setCity] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
   const [filteredStep1Data, setFilteredStep1Data] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null); // Track selected item
   const [countryError, setCountryError] = useState(false);
@@ -374,10 +584,12 @@ function Step1({ onSubmit }) {
               const countries = [
                 ...new Set(results.data.map((row) => row.Country)),
               ];
-              setCountryList(countries);
+              setCountryList(
+                countries.map((country) => ({ label: country, value: country }))
+              );
 
               const cities = [...new Set(results.data.map((row) => row.City))];
-              setCityList(cities);
+              setCityList(cities.map((city) => ({ label: city, value: city })));
               console.log("CSV data loaded:", results.data);
             } else {
               console.error("CSV data parsing failed.");
@@ -396,38 +608,13 @@ function Step1({ onSubmit }) {
   useEffect(() => {
     // Update input fields when a selection is made
     if (selectedItem) {
-      setCountry(selectedItem.Country);
-      setCity(selectedItem.City);
+      setSelectedCountry({
+        label: selectedItem.Country,
+        value: selectedItem.Country,
+      });
+      setSelectedCity({ label: selectedItem.City, value: selectedItem.City });
     }
   }, [selectedItem]);
-
-  const handleCountrySearch = (e) => {
-    const searchTerm = e.target.value;
-    setCountry(searchTerm);
-    // Reset city input
-    setCity("");
-    setCityError(false); // Reset city error
-
-    // Filter data based on selected country
-    const filteredStep1 = filteredData.filter((row) =>
-      row.Country.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    setFilteredStep1Data(filteredStep1);
-  };
-
-  const handleCitySearch = (e) => {
-    const searchTerm = e.target.value;
-    setCity(searchTerm);
-    // Reset country input
-    setCountry("");
-    setCountryError(false); // Reset country error
-
-    // Filter data based on selected city
-    const filteredStep1 = filteredData.filter((row) =>
-      row.City.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    setFilteredStep1Data(filteredStep1);
-  };
 
   const handleItemSelect = (item) => {
     setSelectedItem(item); // Set the selected item
@@ -435,8 +622,8 @@ function Step1({ onSubmit }) {
 
   const handleReset = () => {
     setSelectedItem(null); // Reset the selected item
-    setCity("");
-    setCountry("");
+    setSelectedCountry(null);
+    setSelectedCity(null);
   };
 
   const handleSubmit = (e) => {
@@ -454,7 +641,7 @@ function Step1({ onSubmit }) {
       }));
 
     // Validate country and city inputs
-    if (!country && !city) {
+    if (!selectedCountry && !selectedCity) {
       setCountryError(true);
       setCityError(true);
       return;
@@ -477,15 +664,14 @@ function Step1({ onSubmit }) {
               <Form.Label htmlFor="countrySearch" className="form-label">
                 Enter a country name:
               </Form.Label>
-              <Form.Control
-                type="text"
-                className={`form-control mb-2 ${
-                  countryError ? "is-invalid" : ""
-                }`}
-                id="countrySearch"
-                placeholder="Country"
-                value={country}
-                onChange={handleCountrySearch}
+              <Select
+                className={`mb-2 ${countryError ? "is-invalid" : ""}`}
+                options={countryList}
+                value={selectedCountry}
+                onChange={(selectedOption) =>
+                  setSelectedCountry(selectedOption)
+                }
+                placeholder="Select a country"
               />
             </div>
           </Col>
@@ -494,18 +680,17 @@ function Step1({ onSubmit }) {
               <Form.Label htmlFor="citySearch" className="form-label">
                 Enter a city name:
               </Form.Label>
-              <Form.Control
-                type="text"
-                className={`form-control mb-2 ${cityError ? "is-invalid" : ""}`}
-                id="citySearch"
-                placeholder="City"
-                value={city}
-                onChange={handleCitySearch}
+              <Select
+                className={`mb-2 ${cityError ? "is-invalid" : ""}`}
+                options={cityList}
+                value={selectedCity}
+                onChange={(selectedOption) => setSelectedCity(selectedOption)}
+                placeholder="Select a city"
               />
             </div>
           </Col>
           <div className="mb-5">
-            {country || city ? (
+            {selectedCountry || selectedCity ? (
               filteredStep1Data.length === 0 ? (
                 <p>No results found.</p>
               ) : selectedItem ? null : (

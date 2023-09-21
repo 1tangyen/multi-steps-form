@@ -552,58 +552,16 @@ import Papa from "papaparse";
 import { Container, Form, ListGroup, Button, Row, Col } from "react-bootstrap";
 import Select from "react-select";
 
-function Step1({ onSubmit }) {
-  const [filteredData, setFilteredData] = useState([]);
-  const [countryList, setCountryList] = useState([]);
-  const [cityList, setCityList] = useState([]);
+function Step1({ countryList, cityList }) {
+  console.log("step1 props", countryList);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [filteredStep1Data, setFilteredStep1Data] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null); // Track selected item
-  const [countryError, setCountryError] = useState(false);
-  const [cityError, setCityError] = useState(false);
-
-  useEffect(() => {
-    // Fetch the CSV file asynchronously
-    fetch("/example2.csv") // Adjust the path to the CSV file
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.text();
-      })
-      .then((csvText) => {
-        // Parse the CSV text using Papaparse
-        Papa.parse(csvText, {
-          header: true,
-          dynamicTyping: true,
-          complete: function (results) {
-            if (results.data) {
-              setFilteredData(results.data);
-
-              const countries = [
-                ...new Set(results.data.map((row) => row.Country)),
-              ];
-              setCountryList(
-                countries.map((country) => ({ label: country, value: country }))
-              );
-
-              const cities = [...new Set(results.data.map((row) => row.City))];
-              setCityList(cities.map((city) => ({ label: city, value: city })));
-              console.log("CSV data loaded:", results.data);
-            } else {
-              console.error("CSV data parsing failed.");
-            }
-          },
-          error: function (error) {
-            console.error("CSV parsing error:", error.message);
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  }, []);
+  const [formErrors, setFormErrors] = useState({
+    country: "",
+    city: "",
+  });
 
   useEffect(() => {
     // Update input fields when a selection is made
@@ -629,29 +587,44 @@ function Step1({ onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Gather selected options from checkboxes
-    const selectedOptions = filteredStep1Data
-      .filter((item, index) => {
-        const checkbox = document.getElementById(`checkbox-${index}`);
-        return checkbox && checkbox.checked;
-      })
-      .map((item) => ({
-        Country: item.Country,
-        City: item.City,
-      }));
-
-    // Validate country and city inputs
+    // Validate country and city selections
+    const newFormErrors = {};
     if (!selectedCountry && !selectedCity) {
-      setCountryError(true);
-      setCityError(true);
-      return;
+      newFormErrors.country = "Please select a country";
+      newFormErrors.city = "Please select a city";
+    } else {
+      // You can reset errors if selections are valid
+      newFormErrors.country = "";
+      newFormErrors.city = "";
     }
 
-    // You can perform further actions with the selected options here
-    console.log("Selected Options:", selectedOptions);
+    // Update form errors
+    setFormErrors(newFormErrors);
 
-    // Pass the selected options to the next step
-    // onSubmit(selectedOptions);
+    // Check if there are any errors
+    const hasErrors = Object.values(newFormErrors).some(
+      (error) => error !== ""
+    );
+
+    if (!hasErrors) {
+      // If no errors, continue to the next step
+      // Gather selected options from checkboxes
+      const selectedOptions = filteredStep1Data
+        .filter((item, index) => {
+          const checkbox = document.getElementById(`checkbox-${index}`);
+          return checkbox && checkbox.checked;
+        })
+        .map((item) => ({
+          Country: item.Country,
+          City: item.City,
+        }));
+
+      // You can perform further actions with the selected options here
+      console.log("Selected Options:", selectedOptions);
+
+      // Pass the selected options to the next step
+      // onSubmit(selectedOptions);
+    }
   };
 
   return (
@@ -665,7 +638,7 @@ function Step1({ onSubmit }) {
                 Enter a country name:
               </Form.Label>
               <Select
-                className={`mb-2 ${countryError ? "is-invalid" : ""}`}
+                className={`mb-2 ${formErrors.country ? "is-invalid" : ""}`}
                 options={countryList}
                 value={selectedCountry}
                 onChange={(selectedOption) =>
@@ -673,6 +646,9 @@ function Step1({ onSubmit }) {
                 }
                 placeholder="Select a country"
               />
+              <Form.Control.Feedback>
+                {formErrors.country}
+              </Form.Control.Feedback>
             </div>
           </Col>
           <Col md={6}>
@@ -681,48 +657,17 @@ function Step1({ onSubmit }) {
                 Enter a city name:
               </Form.Label>
               <Select
-                className={`mb-2 ${cityError ? "is-invalid" : ""}`}
+                className={`mb-2 ${formErrors.city ? "is-invalid" : ""}`}
                 options={cityList}
                 value={selectedCity}
                 onChange={(selectedOption) => setSelectedCity(selectedOption)}
                 placeholder="Select a city"
               />
+              <Form.Control.Feedback>{formErrors.city}</Form.Control.Feedback>
             </div>
           </Col>
-          <div className="mb-5">
-            {selectedCountry || selectedCity ? (
-              filteredStep1Data.length === 0 ? (
-                <p>No results found.</p>
-              ) : selectedItem ? null : (
-                <ListGroup>
-                  {filteredStep1Data.map((item, index) => (
-                    <ListGroup.Item
-                      key={index}
-                      action
-                      id={`checkbox-${index}`}
-                      active={item === selectedItem}
-                      onClick={() => handleItemSelect(item)}
-                    >
-                      {`Country: ${item.Country}, City: ${item.City}`}
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              )
-            ) : null}
-          </div>
-          <div className="d-flex justify-content-center mt-3">
-            <Button type="submit" variant="danger" className="me-2">
-              Search
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              onClick={handleReset}
-              disabled={!selectedItem}
-            >
-              Reset
-            </Button>
-          </div>
+
+          {/* ... */}
         </Row>
       </Form>
     </Container>

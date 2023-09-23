@@ -59,23 +59,19 @@ export default function ParentComponent() {
       newLabel += selectedCity.map((city) => city.label).join(", ");
     }
 
-    if (selectedFullName.length > 1) {
+    if (fullNames.length > 0) {
       newLabel += "Selected Name: ";
-      newLabel += selectedFullName.map((name) => name.label).join(", ");
+      newLabel += fullNames.map((name) => name.label).join(", ");
     }
 
-    if (selectedRestaurant.length > 1) {
+    if (restaurants.length > 0) {
       newLabel += "Selected Restaurant: ";
-      newLabel += selectedRestaurant
-        .map((restaurant) => restaurant.label)
-        .join(", ");
+      newLabel += restaurants.map((restaurant) => restaurant.label).join(", ");
     }
 
     return newLabel;
   };
 
-  // console.log("selected Step2", selectedRestaurant);
-  // console.log("selected Step2", selectedFullName);
   return (
     <div className="card-container">
       <Grid

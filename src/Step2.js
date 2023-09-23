@@ -224,12 +224,12 @@ function Step2({
         <Row className="mt-3">
           <div>
             <p>
-              Selected Countries:{" "}
-              {selectedCountry.map((country) => country.label).join(", ")}
+              Selected Full Names:{" "}
+              {fullNames.map((name) => name.label).join(", ")}
             </p>
             <p>
-              Selected Cities:{" "}
-              {selectedCity.map((city) => city.label).join(", ")}
+              Selected Restaurants:{" "}
+              {restaurants.map((restaurant) => restaurant.label).join(", ")}
             </p>
           </div>
         </Row>

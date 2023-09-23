@@ -1,10 +1,34 @@
 .validation-alert {
-    width: 40%;
-    max-width: 400px;
-    /* Adjust the width as needed */
-    padding: 10px;
-    /* Adjust the padding as desired */
+    color: #A24936;
+    margin: 0
 }
 
+.justify-content-md-center {
+    margin: auto, 0;
+}
+
+.card-container {
+    display: flex;
+    align-items: center;
+    background-color: #282B28;
+    min-height: 80vh;
+    padding-inline: 8%;
+}
+
+.form-check-input {
+    background-image: url("data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27><circle r=%273%27 fill=%27%23666%27/></svg>") !important;
+}
+
+.form-check-input:checked {
+    background-color: #666 !important;
+    border-color: #6668 !important;
+    background-image: url("data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27><circle r=%273%27 fill=%27%23fff%27/></svg>") !important;
+}
+
+.form-check-input:focus {
+    border-color: #6668 !important;
+    outline: 0;
+    box-shadow: none !important;
+}
 
 

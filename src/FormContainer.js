@@ -1,180 +1,128 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Step1 from "./Step1";
-import { Row, Col } from "react-bootstrap";
+import Step2 from "./Step2";
 import "./App.css";
-import Papa from "papaparse";
 
 const steps = [
-  {
-    label: "Choose a Location",
-  },
-  {
-    label: "Choose a Restaurant",
-  },
-  {
-    label: "Choose Review Dates Period",
-  },
-  {
-    label: "Review and Confirm",
-  },
+  "Choose a Location",
+  "Choose a Restaurant",
+  "Choose Review Dates Period",
+  "Review and Confirm",
 ];
-
-// Lazy-loaded child components
-const LazyLoadedChildComponent1 = React.lazy(() => import("./Step1"));
-const LazyLoadedChildComponent2 = React.lazy(() => import("./Step2"));
-const LazyLoadedChildComponent3 = React.lazy(() => import("./Step3"));
 
 export default function ParentComponent() {
   const [activeStep, setActiveStep] = useState(0);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  const [countryList, setCountryList] = useState([]);
-  const [cityList, setCityList] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState([]);
+  const [selectedCity, setSelectedCity] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // State to hold filtered data
 
-  useEffect(() => {
-    // Fetch the data here and filter it
-    fetch("/example.csv") // Adjust the path to your data source
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.text();
-      })
-      .then((csvText) => {
-        // Parse the CSV data and filter it
-        Papa.parse(csvText, {
-          header: true,
-          dynamicTyping: true,
-          complete: function (results) {
-            if (results.data) {
-              const countries = [
-                ...new Set(results.data.map((row) => row.Country)),
-              ];
-              const cities = [...new Set(results.data.map((row) => row.City))];
-              setCountryList(countries);
-              setCityList(cities);
-              setDataLoaded(true); // Set dataLoaded to true when data is loaded
-              // console.log("CSV data loaded:", results.data);
-            } else {
-              console.error("CSV data parsing failed.");
-            }
-          },
-          error: function (error) {
-            console.error("CSV parsing error:", error.message);
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  }, []);
+  // Function to handle navigation and data filtering
+  const handleNavigation = (action, selectedOptions) => {
+    if (action === "next") {
+      // Move to the next step
+      if (activeStep === 0) {
+        // If in Step 1, filtered data is already set by Step1 component
+        setSelectedCountry(selectedOptions.selectedCountry);
+        setSelectedCity(selectedOptions.selectedCity);
+        setFilteredData(selectedOptions.filteredData);
+      }
 
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    } else if (action === "back") {
+      // Move to the previous step
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
   };
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  // Function to update the stepper label based on Step2 selections
+  const updateStepperLabel = () => {
+    let newLabel = "Step TBD: ";
 
-  const handleReset = () => {
-    setActiveStep(0);
+    if (selectedCountry.length > 0) {
+      newLabel += "Selected Country: ";
+      newLabel += selectedCountry.map((country) => country.label).join(", ");
+    }
+
+    if (selectedCity.length > 0) {
+      newLabel += "Selected City: ";
+      newLabel += selectedCity.map((city) => city.label).join(", ");
+    }
+
+    return newLabel;
   };
 
   return (
-    <Grid container>
-      <Row style={{ mx: "auto", margin: 0 }}>
-        <Col>
-          <Paper style={{ boxShadow: "none" }}>
-            <div>
-              <Stepper
-                activeStep={activeStep}
-                orientation="vertical"
-                classes={{ circle: "red-stepper-icon-circle" }}
-              >
-                {steps.map((step, index) => (
-                  <Step key={step.label}>
-                    <StepLabel
-                      sx={{
-                        color: index === activeStep ? "#FF6B6B" : "#E0E0E0", // Red for active step, grey for inactive steps
-                        "& .MuiStepIcon-root.Mui-active": {
-                          color: "#FF6B6B", // Light red color for active step icon
-                        },
-                        "& .MuiStepIcon-root.Mui-completed": {
-                          color: "#FF6B6B", // Light red color for completed step icon
-                        },
-                      }}
-                    >
-                      {step.label}
-                      <div>
-                        {index === activeStep && (
-                          <div>
-                            <Button
-                              variant="contained"
-                              onClick={handleNext}
-                              sx={{
-                                ml: 1,
-                                backgroundColor: "#FF6B6B", // Light red color for button
-                                color: "white",
-                              }}
-                            >
-                              {index === steps.length - 1
-                                ? "Finish"
-                                : "Continue"}
-                            </Button>
-                            <Button
-                              disabled={index === 0}
-                              onClick={handleBack}
-                              sx={{
-                                ml: 1,
-                                backgroundColor: "#FF6B6B", // Light red color for back button
-                                color: "white", // White font color
-                              }}
-                            >
-                              Back
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-              {activeStep === steps.length && (
-                <Paper square elevation={0} style={{ padding: "16px" }}>
-                  <Typography>
-                    All steps completed - you&apos;re finished
-                  </Typography>
-                  <Button onClick={handleReset} style={{ marginTop: "8px" }}>
-                    Reset
-                  </Button>
-                </Paper>
-              )}
-            </div>
-          </Paper>
-        </Col>
-        <Col>
-          <Box p={1}>
-            {dataLoaded ? (
-              <React.Suspense fallback={<div>Loading...</div>}>
-                <LazyLoadedChildComponent1
-                  countryList={countryList}
-                  cityList={cityList}
-                />
-              </React.Suspense>
-            ) : (
-              <Typography>Loading data...</Typography>
+    <div className="card-container">
+      <Grid
+        container
+        direction="row"
+        alignItems="center"
+        style={{ backgroundColor: "#fff", padding: "1rem" }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {steps.map((label, index) => {
+              const stepProps = {};
+              const labelProps = {};
+
+              return (
+                <Step key={label} {...stepProps}>
+                  <StepLabel
+                    {...labelProps}
+                    sx={{
+                      color: index === activeStep ? "#83BCA9" : "#E0E0E0",
+                      "& .MuiStepIcon-root.Mui-active": { color: "#83BCA9" },
+                      "& .MuiStepIcon-root.Mui-completed": { color: "#83BCA9" },
+                    }}
+                  >
+                    {label}
+                    {activeStep === 0 && (
+                      <Typography variant="body2" color="textSecondary">
+                        {updateStepperLabel()}
+                      </Typography>
+                    )}
+                    {activeStep === 1 && (
+                      <Typography variant="body2" color="textSecondary">
+                        {updateStepperLabel()}
+                      </Typography>
+                    )}
+                  </StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
+        </Box>
+
+        <Grid item xs={12} sm={8}>
+          <Box sx={{ p: 2 }}>
+            {activeStep === 0 && (
+              <Step1
+                handleNavigation={handleNavigation}
+                selectedCountry={selectedCountry}
+                selectedCity={selectedCity}
+                setSelectedCountry={setSelectedCountry}
+                setSelectedCity={setSelectedCity}
+              />
             )}
+            {activeStep === 1 && (
+              <Step2
+                handleNavigation={handleNavigation}
+                selectedCountry={selectedCountry}
+                selectedCity={selectedCity}
+                filteredStep1Data={filteredData} // Make sure this prop is correctly passed
+                updateStepperLabel={updateStepperLabel} // Pass the updateStepperLabel function
+              />
+            )}
+            {/* Add conditions for Step3 and Step4 rendering here */}
           </Box>
-        </Col>
-      </Row>
-    </Grid>
+        </Grid>
+      </Grid>
+    </div>
   );
 }

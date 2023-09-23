@@ -20,7 +20,12 @@ export default function ParentComponent() {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedCountry, setSelectedCountry] = useState([]);
   const [selectedCity, setSelectedCity] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); // State to hold filtered data
+  const [filteredData, setFilteredData] = useState([]);
+  const [selectedFullName, setSelectedFullName] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState([]);
+  const [fullNames, setFullNames] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
+  const [tried, setTried] = useState([]);
 
   // Function to handle navigation and data filtering
   const handleNavigation = (action, selectedOptions) => {
@@ -40,9 +45,9 @@ export default function ParentComponent() {
     }
   };
 
-  // Function to update the stepper label based on Step2 selections
+  // Function to update the stepper label based on Step1 and Step2 selections
   const updateStepperLabel = () => {
-    let newLabel = "Step TBD: ";
+    let newLabel = "Selected things: ";
 
     if (selectedCountry.length > 0) {
       newLabel += "Selected Country: ";
@@ -54,9 +59,23 @@ export default function ParentComponent() {
       newLabel += selectedCity.map((city) => city.label).join(", ");
     }
 
+    if (selectedFullName.length > 1) {
+      newLabel += "Selected Name: ";
+      newLabel += selectedFullName.map((name) => name.label).join(", ");
+    }
+
+    if (selectedRestaurant.length > 1) {
+      newLabel += "Selected Restaurant: ";
+      newLabel += selectedRestaurant
+        .map((restaurant) => restaurant.label)
+        .join(", ");
+    }
+
     return newLabel;
   };
 
+  // console.log("selected Step2", selectedRestaurant);
+  // console.log("selected Step2", selectedFullName);
   return (
     <div className="card-container">
       <Grid
@@ -82,12 +101,12 @@ export default function ParentComponent() {
                     }}
                   >
                     {label}
-                    {activeStep === 0 && (
+                    {index === 0 && (
                       <Typography variant="body2" color="textSecondary">
                         {updateStepperLabel()}
                       </Typography>
                     )}
-                    {activeStep === 1 && (
+                    {index === 1 && (
                       <Typography variant="body2" color="textSecondary">
                         {updateStepperLabel()}
                       </Typography>
@@ -115,10 +134,17 @@ export default function ParentComponent() {
                 handleNavigation={handleNavigation}
                 selectedCountry={selectedCountry}
                 selectedCity={selectedCity}
-                filteredStep1Data={filteredData} // Make sure this prop is correctly passed
-                updateStepperLabel={updateStepperLabel} // Pass the updateStepperLabel function
+                filteredStep1Data={filteredData}
+                fullNames={fullNames}
+                setSelectedFullName={setFullNames} // Pass the setter function
+                restaurants={restaurants}
+                setSelectedRestaurant={setRestaurants} // Pass the setter function
+                tried={tried}
+                setSelectedTried={setTried} // Pass the setter function
+                updateStepperLabel={updateStepperLabel}
               />
             )}
+
             {/* Add conditions for Step3 and Step4 rendering here */}
           </Box>
         </Grid>

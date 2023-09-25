@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Form, Button, Row } from "react-bootstrap";
 import Select from "react-select";
 import Papa from "papaparse";
+import Box from "@mui/material/Box";
 
 function Step1({
   handleNavigation,
@@ -21,6 +22,51 @@ function Step1({
     city: "",
   });
 
+  const [countryOptions, setCountryOptions] = useState([]);
+  const [cityOptions, setCityOptions] = useState([]);
+
+  // Function to fetch data and populate options
+  const fetchDataAndPopulateOptions = async () => {
+    try {
+      const response = await fetch("/example.csv"); // Adjust the path to your data source
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const csvText = await response.text();
+      const results = await new Promise((resolve, reject) => {
+        Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          complete: resolve,
+          error: reject,
+        });
+      });
+
+      if (results.data) {
+        setFetchedData(results.data);
+        const countries = [...new Set(results.data.map((row) => row.Country))];
+        const cities = [...new Set(results.data.map((row) => row.City))];
+
+        setCountryList(countries);
+        setCityList(cities);
+        setCountryOptions(
+          countries.map((country) => ({ label: country, value: country }))
+        );
+        setCityOptions(cities.map((city) => ({ label: city, value: city })));
+        setDataLoaded(true);
+      } else {
+        console.error("CSV data parsing failed.");
+      }
+    } catch (error) {
+      console.error("Data loading error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataAndPopulateOptions();
+  }, []); // Fetch data when the component mounts
+
   // Function to reset selections and errors
   const handleReset = () => {
     setSelectedCountry([]);
@@ -29,47 +75,9 @@ function Step1({
       country: "",
       city: "",
     });
+    // Refetch data to populate options again
+    fetchDataAndPopulateOptions();
   };
-
-  useEffect(() => {
-    // Fetch the data here and filter it
-    fetch("/example.csv") // Adjust the path to your data source
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.text();
-      })
-      .then((csvText) => {
-        // Parse the CSV data and filter it
-        Papa.parse(csvText, {
-          header: true,
-          dynamicTyping: true,
-          complete: function (results) {
-            if (results.data) {
-              setFetchedData(results.data);
-              const countries = [
-                ...new Set(results.data.map((row) => row.Country)),
-              ];
-              const cities = [...new Set(results.data.map((row) => row.City))];
-
-              setCountryList(countries); // Initialize countryList
-              setCityList(cities); // Initialize cityList
-              // console.log("CSV data loaded:", results.data);
-              setDataLoaded(true); // Set dataLoaded to true when data is loaded
-            } else {
-              console.error("CSV data parsing failed.");
-            }
-          },
-          error: function (error) {
-            console.error("CSV parsing error:", error.message);
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  }, []);
 
   const handleCountryChange = (selectedOptions) => {
     setSelectedCountry(selectedOptions);
@@ -184,30 +192,8 @@ function Step1({
     }
   };
 
-  // Display the selected options in the stepper label
-  const selectedCountryLabels =
-    selectedCountry.length > 0 &&
-    selectedCountry.map((option) => option.label).join(", ");
-
-  const selectedCityLabels =
-    selectedCity.length > 0 &&
-    selectedCity.map((option) => option.label).join(", ");
-
-  const stepperLabel = (
-    <div>
-      Step 1: Choose One or Both
-      {selectedCountry.length > 0 && (
-        <div>Selected Countries: {selectedCountryLabels}</div>
-      )}
-      {selectedCity.length > 0 && (
-        <div>Selected Cities: {selectedCityLabels}</div>
-      )}
-    </div>
-  );
-
   return (
     <Container>
-      {/* <h4 className="mb-4">{stepperLabel}</h4> */}
       <p>Enter countries and/or cities to continue.</p>
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
@@ -217,9 +203,10 @@ function Step1({
             </Form.Label>
             <Select
               id="countrySelect"
+              isClearable={false}
               isMulti
               className={`mb-2 ${formErrors.country ? "is-invalid" : ""}`}
-              options={formattedCountryList}
+              options={countryOptions}
               value={selectedCountry}
               onChange={handleCountryChange}
               placeholder="Select countries"
@@ -234,9 +221,10 @@ function Step1({
             </Form.Label>
             <Select
               id="citySelect"
+              isClearable={false}
               isMulti
               className={`mb-2 ${formErrors.city ? "is-invalid" : ""}`}
-              options={formattedCityList}
+              options={cityOptions}
               value={selectedCity}
               onChange={handleCityChange}
               placeholder="Select cities"
@@ -246,7 +234,19 @@ function Step1({
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
-        <Row>
+        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+          <Button
+            variant="text"
+            onClick={handleReset}
+            style={{
+              borderRadius: 55,
+              backgroundColor: "#fff",
+              color: "#282B28",
+            }}
+          >
+            Reset
+          </Button>
+
           <Button
             variant="contained"
             style={{
@@ -257,17 +257,7 @@ function Step1({
           >
             Next Step
           </Button>
-          <Button
-            variant="outlined"
-            style={{
-              borderRadius: 55,
-              marginLeft: "10px",
-            }}
-            onClick={handleReset}
-          >
-            Reset
-          </Button>
-        </Row>
+        </Box>
       </Form>
     </Container>
   );

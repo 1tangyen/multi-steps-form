@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Row } from "react-bootstrap";
 import Select from "react-select";
+import Box from "@mui/material/Box";
 
 function Step2({
   handleNavigation,
@@ -13,6 +14,7 @@ function Step2({
   setSelectedRestaurant,
   tried,
   setSelectedTried,
+  handleBack,
 }) {
   const [query, setQuery] = useState("");
   const [fullNameOptions, setFullNameOptions] = useState([]);
@@ -75,6 +77,12 @@ function Step2({
       selectedCity,
       fullQuery,
     });
+  };
+
+  const clearSelectedOptions = () => {
+    setSelectedFullName([]);
+    setSelectedRestaurant([]);
+    setSelectedTried([]);
   };
 
   const handleFullNameChange = (selectedOptions) => {
@@ -209,10 +217,26 @@ function Step2({
           </Form.Group>
         </Row>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <Row>
+        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+          <Button
+            variant="text"
+            onClick={() => {
+              handleBack();
+              clearSelectedOptions();
+            }}
+            style={{
+              borderRadius: 55,
+              backgroundColor: "#fff",
+              color: "#282B28",
+            }}
+          >
+            Back
+          </Button>
+
           <Button
             variant="contained"
             style={{
+              size: "",
               borderRadius: 55,
               backgroundColor: "#83BCA9",
             }}
@@ -220,19 +244,7 @@ function Step2({
           >
             Next Step
           </Button>
-        </Row>
-        <Row className="mt-3">
-          <div>
-            <p>
-              Selected Full Names:{" "}
-              {fullNames.map((name) => name.label).join(", ")}
-            </p>
-            <p>
-              Selected Restaurants:{" "}
-              {restaurants.map((restaurant) => restaurant.label).join(", ")}
-            </p>
-          </div>
-        </Row>
+        </Box>
       </Form>
     </Container>
   );

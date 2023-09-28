@@ -26,6 +26,7 @@ function Step1({
   const [cityOptions, setCityOptions] = useState([]);
 
   // Function to fetch data and populate options
+
   const fetchDataAndPopulateOptions = async () => {
     try {
       const response = await fetch("/example.csv"); // Adjust the path to your data source
@@ -43,7 +44,7 @@ function Step1({
         });
       });
 
-      if (results.data) {
+      if (results.data.length > 0) {
         setFetchedData(results.data);
         const countries = [...new Set(results.data.map((row) => row.Country))];
         const cities = [...new Set(results.data.map((row) => row.City))];
@@ -65,7 +66,7 @@ function Step1({
 
   useEffect(() => {
     fetchDataAndPopulateOptions();
-  }, []); // Fetch data when the component mounts
+  }, []);
 
   // Function to reset selections and errors
   const handleReset = () => {
@@ -84,6 +85,7 @@ function Step1({
     if (selectedOptions.length > 0) {
       // Filter city options based on selected countries
       const selectedCountries = selectedOptions.map((option) => option.value);
+
       const citiesForSelectedCountries = [
         ...new Set(
           fetchedData
@@ -91,10 +93,13 @@ function Step1({
             .map((item) => item.City)
         ),
       ];
-      setCityList(citiesForSelectedCountries);
+
+      setCityOptions(
+        citiesForSelectedCountries.map((city) => ({ label: city, value: city }))
+      );
     } else {
       // Reset city options when no countries are selected
-      setCityList([]);
+      setCityOptions([]);
     }
   };
 
@@ -110,24 +115,18 @@ function Step1({
             .map((item) => item.Country)
         ),
       ];
-      setCountryList(countriesForSelectedCities);
+      setCountryOptions(
+        countriesForSelectedCities.map((country) => ({
+          label: country,
+          value: country,
+        }))
+      );
     } else {
       // Reset country options when no cities are selected
       setCountryList([]);
     }
   };
 
-  const formattedCountryList = countryList.map((country) => ({
-    label: country,
-    value: country,
-  }));
-
-  const formattedCityList = cityList.map((city) => ({
-    label: city,
-    value: city,
-  }));
-
-  // Function to filter data based on selected options
   const filterData = (selectedOptions) => {
     const filteredData = fetchedData.filter((item) => {
       if (
@@ -182,8 +181,9 @@ function Step1({
         selectedCity,
       });
       // Log the filtered data
-      console.log("Filtered Data:", filteredStep1Data);
-      // Pass the selected options and filtered data to the parent component
+      // console.log("selectedCountry:", selectedCountry);
+      // console.log("selectedCity:", selectedCity);
+
       handleNavigation("next", {
         selectedCountry,
         selectedCity,

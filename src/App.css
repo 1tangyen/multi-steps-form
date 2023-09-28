@@ -1,3 +1,19 @@
+.body{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+}
+
+.App-header {
+    background-color: #ffffff;
+    color:black;
+
+}
+
 .validation-alert {
     color: #A24936;
     margin: 0
@@ -8,11 +24,14 @@
 }
 
 .card-container {
+    margin-top: 20px;
     display: flex;
+
     align-items: center;
     background-color: #282B28;
-    min-height: 80vh;
-    padding-inline: 8%;
+    min-height: 90vh;
+
+    padding-inline: 1rem;
 }
 
 .form-check-input {

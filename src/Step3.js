@@ -1,199 +1,194 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Button } from "react-bootstrap";
-import Box from "@mui/material/Box";
+import dayjs from "dayjs";
+import { Form, Row, Alert, Button } from "react-bootstrap";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Container } from "react-bootstrap";
 
-function Step3({
-  handleNavigation,
-  handleBack,
-  selectedDates,
-  setSelectedDates,
-}) {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [secondRangeEnabled, setSecondRangeEnabled] = useState(false);
-  const [secondStartDate, setSecondStartDate] = useState("");
-  const [secondEndDate, setSecondEndDate] = useState("");
-  const [error, setError] = useState("");
-  console.log(startDate);
-  const handleNext = () => {
-    setError(""); // Clear any existing error message
+export default function Step3({ handleNavigation, handleBack, dateDate }) {
+  const [isSwitchOn, setIsSwitchOn] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [startDate, setStartDate] = useState(
+    dayjs(new Date()).subtract(1, "year")
+  );
+  const [endDate, setEndDate] = useState(dayjs(new Date()));
+  const [prevStartDate, setPrevStartDate] = useState(
+    dayjs(new Date()).subtract(2, "year")
+  );
+  const [prevEndDate, setPrevEndDate] = useState(
+    dayjs(new Date()).subtract(1, "year")
+  );
+
+  const handleToggle = () => setIsSwitchOn(!isSwitchOn);
+
+  const formatAsDateString = (date) => {
+    return date ? date.format("MM/DD/YYYY") : ""; // Format the date as a string if it exists
+  };
+
+  useEffect(() => {
+    // Initialize startDate and endDate with default values
+    const defaultStartDate = dayjs().subtract(1, "year");
+
+    setStartDate(defaultStartDate);
+    setEndDate(dayjs());
+  }, []);
+
+  useEffect(() => {
+    // Initialize prevStartDate and prevEndDate with default values
+    const defaultPrevStartDate = dayjs().subtract(2, "year");
+    const defaultPrevEndDate = dayjs().subtract(1, "year");
+
+    setPrevStartDate(defaultPrevStartDate);
+    setPrevEndDate(defaultPrevEndDate);
+  }, [isSwitchOn]);
+
+  const validate = () => {
+    const errors = [];
 
     if (!startDate || !endDate) {
-      setError(
-        "Please select both a start date and an end date for the first range."
-      );
-      return;
+      errors.push("Please select both start and end dates.");
+    } else if (
+      dayjs(startDate).isAfter(dayjs(endDate)) ||
+      dayjs(startDate).isSame(dayjs(endDate))
+    ) {
+      errors.push("Start date must be before end date.");
     }
 
-    const today = new Date();
-    const selectedStartDate = new Date(startDate);
-    const selectedEndDate = new Date(endDate);
-
-    if (selectedStartDate > today || selectedEndDate > today) {
-      setError(
-        "Start date and end date for the first range cannot be later than today."
-      );
-      return;
+    if (isSwitchOn) {
+      if (!prevStartDate || !prevEndDate) {
+        errors.push("Please select both previous start and end dates.");
+      } else if (
+        dayjs(prevStartDate).isAfter(dayjs(prevEndDate)) ||
+        dayjs(prevStartDate).isSame(dayjs(prevEndDate))
+      ) {
+        errors.push("Previous start date must be before previous end date.");
+      }
     }
 
-    if (selectedStartDate > selectedEndDate) {
-      setError(
-        "End date for the first range cannot be earlier than the start date."
-      );
-      return;
-    }
+    setErrorMessages(errors);
 
-    let dataToLog = {
-      firstRange: { startDate, endDate },
-    };
+    return errors.length === 0;
+  };
 
-    if (secondRangeEnabled) {
-      if (!secondStartDate || !secondEndDate) {
-        setError(
-          "Please select both a start date and an end date for the second range."
-        );
-        return;
-      }
+  const clearSelectedOptions = () => {
+    setStartDate(dayjs());
+    setEndDate(dayjs());
+    setPrevStartDate(dayjs());
+    setPrevEndDate(dayjs());
+  };
 
-      const selectedSecondStartDate = new Date(secondStartDate);
-      const selectedSecondEndDate = new Date(secondEndDate);
-
-      if (selectedSecondStartDate > today || selectedSecondEndDate > today) {
-        setError(
-          "Start date and end date for the second range cannot be later than today."
-        );
-        return;
-      }
-
-      if (selectedSecondStartDate > selectedSecondEndDate) {
-        setError(
-          "End date for the second range cannot be earlier than the start date."
-        );
-        return;
-      }
-
-      dataToLog = {
-        ...dataToLog,
-        secondRange: { startDate: secondStartDate, endDate: secondEndDate },
+  const handleNext = () => {
+    if (validate()) {
+      console.log("startDate", formatAsDateString(startDate));
+      console.log("endDate", formatAsDateString(endDate));
+      console.log("prevStartDate", formatAsDateString(prevStartDate));
+      console.log("prevEndDate", formatAsDateString(prevEndDate));
+      const dateData = {
+        startDate: formatAsDateString(startDate),
+        endDate: formatAsDateString(endDate),
+        prevStartDate: formatAsDateString(prevStartDate),
+        prevEndDate: formatAsDateString(prevEndDate),
       };
+
+      // Pass dateData to FormContainer
+      handleNavigation("next", { dateData });
     }
-
-    // Call setSelectedDates to pass the selected dates to the parent component
-    setSelectedDates(dataToLog);
-
-    // Continue with navigation
-    handleNavigation("next", dataToLog);
-  };
-  console.log(selectedDates.firstRange);
-  const handleStartDateChange = (e) => {
-    setStartDate(e.target.value);
-    setError(""); // Clear error when start date is changed
-  };
-
-  const handleEndDateChange = (e) => {
-    setEndDate(e.target.value);
-    setError(""); // Clear error when end date is changed
-  };
-
-  const handleSecondRangeToggle = () => {
-    setSecondRangeEnabled((prev) => !prev);
-
-    // Clear the second range date fields when disabling the toggle
-    if (!secondRangeEnabled) {
-      setSecondStartDate("");
-      setSecondEndDate("");
-    }
-  };
-
-  const handleSecondStartDateChange = (e) => {
-    setSecondStartDate(e.target.value);
-    setError(""); // Clear error when second start date is changed
-  };
-
-  const handleSecondEndDateChange = (e) => {
-    setSecondEndDate(e.target.value);
-    setError(""); // Clear error when second end date is changed
   };
 
   return (
     <Container>
-      <h4 className="mb-4">Step 3: Choose Review Dates Period</h4>
-      <Form>
-        <Form.Group className="mb-3">
-          <Form.Label>Start Date:</Form.Label>
-          <Form.Control
-            type="date"
-            value={startDate}
-            onChange={handleStartDateChange}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>End Date:</Form.Label>
-          <Form.Control
-            type="date"
-            value={endDate}
-            onChange={handleEndDateChange}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Check
-            type="switch"
-            id="secondRangeToggle"
-            label="Enable Second Date Range"
-            checked={secondRangeEnabled}
-            onChange={handleSecondRangeToggle}
-          />
-        </Form.Group>
-        {secondRangeEnabled && (
-          <div>
-            <Form.Group className="mb-3">
-              <Form.Label>Second Start Date:</Form.Label>
-              <Form.Control
-                type="date"
-                value={secondStartDate}
-                onChange={handleSecondStartDateChange}
+      <h4 className="mb-3">Step 3: Select a review data</h4>
+      {errorMessages.length > 0 && (
+        <Alert variant="danger">
+          {errorMessages.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </Alert>
+      )}
+      <Row>
+        <Form.Group className="mb-3" controlId="formBasicCheckbox">
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker", "DatePicker"]}>
+              <DatePicker
+                label="Start date"
+                value={startDate}
+                onChange={(newValue) => {
+                  setStartDate(newValue);
+                }}
+                format="MM/DD/YYYY"
               />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Second End Date:</Form.Label>
-              <Form.Control
-                type="date"
-                value={secondEndDate}
-                onChange={handleSecondEndDateChange}
+              <DatePicker
+                label="End date"
+                value={endDate}
+                onChange={(newValue) => {
+                  setEndDate(newValue);
+                }}
+                format="MM/DD/YYYY"
               />
-            </Form.Group>
-          </div>
+            </DemoContainer>
+          </LocalizationProvider>
+        </Form.Group>
+      </Row>
+      <Form.Group className="mb-3" controlId="formBasicCheckbox">
+        <Form.Check
+          type="switch"
+          label="Add a review data from the previous date"
+          onClick={handleToggle}
+        />
+        {isSwitchOn && (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={["DatePicker", "DatePicker"]}>
+              <DatePicker
+                label="Previous start date"
+                value={prevStartDate}
+                onChange={(newValue) => {
+                  setPrevStartDate(newValue);
+                }}
+                format="MM/DD/YYYY"
+              />
+              <DatePicker
+                label="Previous end date"
+                value={prevEndDate}
+                onChange={(newValue) => {
+                  setPrevEndDate(newValue);
+                }}
+                format="MM/DD/YYYY"
+              />
+            </DemoContainer>
+          </LocalizationProvider>
         )}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-          <Button
-            variant="text"
-            onClick={handleBack}
-            style={{
-              borderRadius: 55,
-              backgroundColor: "#fff",
-              color: "#282B28",
-            }}
-          >
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            style={{
-              size: "",
-              borderRadius: 55,
-              backgroundColor: "#83BCA9",
-              marginLeft: "1rem",
-            }}
-            type="button"
-            onClick={handleNext}
-          >
-            Next Step
-          </Button>
-        </Box>
-      </Form>
+      </Form.Group>
+      <div className="mb-3">
+        <Button
+          variant="text"
+          onClick={() => {
+            handleBack();
+            clearSelectedOptions();
+          }}
+          style={{
+            borderRadius: 55,
+            backgroundColor: "#fff",
+            color: "#282B28",
+          }}
+        >
+          Back
+        </Button>
+
+        <Button
+          variant="contained"
+          style={{
+            size: "",
+            borderRadius: 55,
+            backgroundColor: "#83BCA9",
+          }}
+          type="submit"
+          onClick={handleNext}
+        >
+          Next Step
+        </Button>
+      </div>
     </Container>
   );
 }
-
-export default Step3;

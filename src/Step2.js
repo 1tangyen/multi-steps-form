@@ -1,38 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Container, Form, Button, Row } from "react-bootstrap";
+import { Container, Form, Button, Row, Alert } from "react-bootstrap";
 import Select from "react-select";
 import Box from "@mui/material/Box";
 
 function Step2({
+  handleBack,
   handleNavigation,
   selectedCountry,
   selectedCity,
-  filteredStep1Data,
+  setFormData,
+  formData,
   fullNames,
-  setSelectedFullName,
+  setFullNames,
   restaurants,
-  setSelectedRestaurant,
+  setRestaurants,
   tried,
-  setSelectedTried,
-  handleBack,
+  setTried,
+  setFullQuery,
 }) {
   const [query, setQuery] = useState("");
   const [fullNameOptions, setFullNameOptions] = useState([]);
   const [restaurantOptions, setRestaurantOptions] = useState([]);
   const [triedOptions, setTriedOptions] = useState([]);
-  const [error, setError] = useState("");
+  const [errorMessages, setErrorMessages] = useState([]);
 
   useEffect(() => {
-    if (filteredStep1Data && filteredStep1Data.length > 0) {
-      // Populate options based on filtered data
+    if (formData.filteredData && formData.filteredData.length > 0) {
       const uniqueTried = [
-        ...new Set(filteredStep1Data.map((item) => item.Tried)),
+        ...new Set(formData.filteredData.map((item) => item.Tried)),
       ];
       const fullNames = [
-        ...new Set(filteredStep1Data.map((row) => row.full_name)),
+        ...new Set(formData.filteredData.map((row) => row.full_name)),
       ];
       const restaurants = [
-        ...new Set(filteredStep1Data.map((row) => row.Restaurant)),
+        ...new Set(formData.filteredData.map((row) => row.Restaurant)),
       ];
 
       setFullNameOptions(fullNames.map((value) => ({ label: value, value })));
@@ -41,135 +42,142 @@ function Step2({
       );
       setTriedOptions(uniqueTried.map((value) => ({ label: value, value })));
     }
-  }, [filteredStep1Data]);
+  }, [formData.filteredData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation: Check if at least one of Full Name or Restaurant is selected
-    if (fullNames.length === 0 && restaurants.length === 0) {
-      setError("Please select at least one Full Name or Restaurant.");
-      return;
-    } else {
-      setError("");
+    const errors = [];
+
+    if (!fullNames.length && !restaurants.length) {
+      errors.push("Please select at least one Full Name or Restaurant.");
     }
 
-    let fullQuery = query;
+    if (errors.length > 0) {
+      setErrorMessages(errors);
+      return;
+    }
+
+    let fullQuery = {};
 
     if (fullNames.length > 0) {
-      fullQuery += ` Full Name: ${fullNames
-        .map((name) => name.label)
-        .join(", ")}`;
+      fullQuery.fullNames = fullNames.map((name) => name.value);
     }
 
     if (restaurants.length > 0) {
-      fullQuery += ` Restaurant: ${restaurants
-        .map((restaurant) => restaurant.label)
-        .join(", ")}`;
+      fullQuery.restaurants = restaurants.map((restaurant) => restaurant.value);
     }
 
     if (tried.length > 0) {
-      fullQuery += ` Tried: ${tried.map((option) => option.label).join(", ")}`;
+      fullQuery.tried = tried.map((option) => option.value);
     }
 
+    if (selectedCountry) {
+      fullQuery.country = selectedCountry.map((country) => country.value);
+    }
+
+    if (selectedCity) {
+      fullQuery.city = selectedCity.map((city) => city.value);
+    }
+
+    // Update the fullQuery state in FormContainer
+    setFullQuery(fullQuery);
+
+    // Proceed to the next step
     handleNavigation("next", {
-      selectedCountry,
-      selectedCity,
       fullQuery,
     });
   };
 
   const clearSelectedOptions = () => {
-    setSelectedFullName([]);
-    setSelectedRestaurant([]);
-    setSelectedTried([]);
+    setFormData({
+      ...formData,
+      fullNames: [],
+      restaurants: [],
+      tried: [],
+    });
   };
 
   const handleFullNameChange = (selectedOptions) => {
-    setSelectedFullName(selectedOptions);
+    const selectedFullNames = selectedOptions.map((option) => option.value);
+    setFullNames(selectedOptions);
+    const restaurantsForSelectedFullNames = [
+      ...new Set(
+        formData.filteredData
+          .filter((item) => selectedFullNames.includes(item.full_name))
+          .map((item) => item.Restaurant)
+      ),
+    ];
 
-    if (selectedOptions.length > 0) {
-      const selectedFullNames = selectedOptions.map((option) => option.value);
-      const restaurantsForSelectedFullNames = [
-        ...new Set(
-          filteredStep1Data
-            .filter((item) => selectedFullNames.includes(item.full_name))
-            .map((item) => item.Restaurant)
-        ),
-      ];
+    setRestaurantOptions(
+      restaurantsForSelectedFullNames.map((value) => ({
+        label: value,
+        value: value,
+      }))
+    );
 
-      setRestaurantOptions(
-        restaurantsForSelectedFullNames.map((value) => ({
-          label: value,
-          value: value,
-        }))
-      );
+    const triedForSelectedFullNames = [
+      ...new Set(
+        formData.filteredData
+          .filter((item) => selectedFullNames.includes(item.full_name))
+          .map((item) => item.Tried)
+      ),
+    ];
 
-      const triedForSelectedFullNames = [
-        ...new Set(
-          filteredStep1Data
-            .filter((item) => selectedFullNames.includes(item.full_name))
-            .map((item) => item.Tried)
-        ),
-      ];
-
-      setTriedOptions(
-        triedForSelectedFullNames.map((value) => ({
-          label: value,
-          value: value,
-        }))
-      );
-    } else {
-      setRestaurantOptions([]);
-      setTriedOptions([]);
-    }
+    setTriedOptions(
+      triedForSelectedFullNames.map((value) => ({
+        label: value,
+        value: value,
+      }))
+    );
   };
 
   const handleRestaurantChange = (selectedOptions) => {
-    setSelectedRestaurant(selectedOptions);
+    const selectedRestaurantNames = selectedOptions.map(
+      (option) => option.value
+    );
+    setRestaurants(selectedOptions);
+    const fullNamesForSelectedRestaurants = [
+      ...new Set(
+        formData.filteredData
+          .filter((item) => selectedRestaurantNames.includes(item.Restaurant))
+          .map((item) => item.full_name)
+      ),
+    ];
 
-    if (selectedOptions.length > 0) {
-      const selectedRestaurantNames = selectedOptions.map(
-        (option) => option.value
-      );
-      const fullNamesForSelectedRestaurants = [
-        ...new Set(
-          filteredStep1Data
-            .filter((item) => selectedRestaurantNames.includes(item.Restaurant))
-            .map((item) => item.full_name)
-        ),
-      ];
+    setFullNameOptions(
+      fullNamesForSelectedRestaurants.map((value) => ({
+        label: value,
+        value: value,
+      }))
+    );
 
-      setFullNameOptions(
-        fullNamesForSelectedRestaurants.map((value) => ({
-          label: value,
-          value: value,
-        }))
-      );
+    const triedForSelectedRestaurants = [
+      ...new Set(
+        formData.filteredData
+          .filter((item) => selectedRestaurantNames.includes(item.Restaurant))
+          .map((item) => item.Tried)
+      ),
+    ];
 
-      const triedForSelectedRestaurants = [
-        ...new Set(
-          filteredStep1Data
-            .filter((item) => selectedRestaurantNames.includes(item.Restaurant))
-            .map((item) => item.Tried)
-        ),
-      ];
-
-      setTriedOptions(
-        triedForSelectedRestaurants.map((value) => ({
-          label: value,
-          value: value,
-        }))
-      );
-    } else {
-      setFullNameOptions([]);
-      setTriedOptions([]);
-    }
+    setTriedOptions(
+      triedForSelectedRestaurants.map((value) => ({
+        label: value,
+        value: value,
+      }))
+    );
   };
 
   return (
     <Container>
       <h4 className="mb-4">Step 2: Create Your Query</h4>
+      {errorMessages.length > 0 && (
+        <Alert variant="danger">
+          {errorMessages.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </Alert>
+      )}
       <Form onSubmit={handleSubmit}>
         <Row className="mb-3">
           <Form.Group md={6}>
@@ -200,23 +208,21 @@ function Step2({
               placeholder="Select Restaurant"
             />
           </Form.Group>
-        </Row>
-        <Row className="mb-3">
-          <Form.Group md={12}>
-            <Form.Label htmlFor="triedSelect" className="form-label">
-              Tried (optional):
+          <Form.Group md={6}>
+            <Form.Label htmlFor="restaurantSelect" className="form-label">
+              Tried:
             </Form.Label>
             <Select
-              id="triedSelect"
-              isMulti
+              id="restaurantSelect"
+              isClearable
               options={triedOptions}
               value={tried}
-              onChange={(selectedOptions) => setSelectedTried(selectedOptions)}
-              placeholder="Select Tried options"
+              onChange={(selectedOptions) => setTried(selectedOptions)}
+              isMulti
+              placeholder="Select Restaurant"
             />
           </Form.Group>
         </Row>
-        {error && <p style={{ color: "red" }}>{error}</p>}
         <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
           <Button
             variant="text"

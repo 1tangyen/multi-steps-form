@@ -1,53 +1,27 @@
-.body{
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    justify-content: center;
+.body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
 }
 
-.App-header {
-    background-color: #ffffff;
-    color:black;
-
+.black-text {
+    color: #000;
 }
 
-.validation-alert {
-    color: #A24936;
-    margin: 0
+.restaurant-text {
+    color: #f7f7f7;
 }
 
-.justify-content-md-center {
-    margin: auto, 0;
+button {
+    margin-right: 8px;
 }
 
-.card-container {
-    margin-top: 20px;
-    display: flex;
+/* Mobile adjustments */
+@media only screen and (max-width: 600px) {
+    h1 {
+        font-size: 24px;
+    }
 
-    align-items: center;
-    background-color: #282B28;
-    min-height: 90vh;
-
-    padding-inline: 1rem;
+    p {
+        font-size: 16px;
+    }
 }
-
-.form-check-input {
-    background-image: url("data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27><circle r=%273%27 fill=%27%23666%27/></svg>") !important;
-}
-
-.form-check-input:checked {
-    background-color: #666 !important;
-    border-color: #6668 !important;
-    background-image: url("data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%27-4 -4 8 8%27><circle r=%273%27 fill=%27%23fff%27/></svg>") !important;
-}
-
-.form-check-input:focus {
-    border-color: #6668 !important;
-    outline: 0;
-    box-shadow: none !important;
-}
-
-

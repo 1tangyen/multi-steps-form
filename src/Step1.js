@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Container, Form, Button, Row } from "react-bootstrap";
+import { Form, Row } from "react-bootstrap";
 import Select from "react-select";
 import Papa from "papaparse";
-import Box from "@mui/material/Box";
+
+import { Container, Button, Typography, Paper, Box } from "@mui/material";
 
 function Step1({
   handleNavigation,
@@ -193,73 +194,81 @@ function Step1({
   };
 
   return (
-    <Container>
-      <p>Enter countries and/or cities to continue.</p>
-      <Form onSubmit={handleSubmit}>
-        <Row className="mb-3">
-          <Form.Group md={6}>
-            <Form.Label htmlFor="countrySelect" className="form-label">
-              Enter a country name:
-            </Form.Label>
-            <Select
-              id="countrySelect"
-              isClearable={false}
-              isMulti
-              className={`mb-2 ${formErrors.country ? "is-invalid" : ""}`}
-              options={countryOptions}
-              value={selectedCountry}
-              onChange={handleCountryChange}
-              placeholder="Select countries"
-            />
-            <Form.Control.Feedback type="invalid">
-              {formErrors.country}
-            </Form.Control.Feedback>
-          </Form.Group>
-          <Form.Group md={6}>
-            <Form.Label htmlFor="citySelect" className="form-label">
-              Enter a city name:
-            </Form.Label>
-            <Select
-              id="citySelect"
-              isClearable={false}
-              isMulti
-              className={`mb-2 ${formErrors.city ? "is-invalid" : ""}`}
-              options={cityOptions}
-              value={selectedCity}
-              onChange={handleCityChange}
-              placeholder="Select cities"
-            />
-            <Form.Control.Feedback type="invalid">
-              {formErrors.city}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-          <Button
-            variant="text"
-            onClick={handleReset}
-            style={{
-              borderRadius: 55,
-              backgroundColor: "#fff",
-              color: "#282B28",
-            }}
-          >
-            Reset
-          </Button>
-
-          <Button
-            variant="contained"
-            style={{
-              borderRadius: 55,
-              backgroundColor: "#83BCA9",
-            }}
-            type="submit"
-          >
-            Next Step
-          </Button>
-        </Box>
-      </Form>
-    </Container>
+    <div className="form-content">
+      <Container>
+        <div className="form">
+          <Form onSubmit={handleSubmit}>
+            <Row className="mb-3">
+              <Form.Group md={6} className="label-align-left">
+                {" "}
+                {/* Add custom class for label alignment */}
+                <Form.Label htmlFor="countrySelect">
+                  Enter a country name:
+                </Form.Label>
+                <Select
+                  id="countrySelect"
+                  isClearable={false}
+                  isMulti
+                  className={`mb-2 select ${
+                    formErrors.country ? "is-invalid" : ""
+                  }`}
+                  options={countryOptions}
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  placeholder="Select countries"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formErrors.country}
+                </Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group md={6} className="label-align-left">
+                {" "}
+                {/* Add custom class for label alignment */}
+                <Form.Label htmlFor="citySelect">Enter a city name:</Form.Label>
+                <Select
+                  id="citySelect"
+                  isClearable={false}
+                  isMulti
+                  className={`mb-2 select ${
+                    formErrors.city ? "is-invalid" : ""
+                  }`}
+                  options={cityOptions}
+                  value={selectedCity}
+                  onChange={handleCityChange}
+                  placeholder="Select cities"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formErrors.city}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+            <Box className="buttons">
+              <Button
+                variant="text"
+                onClick={handleReset}
+                style={{
+                  borderRadius: 55,
+                  backgroundColor: "#fff",
+                  color: "#282B28",
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                variant="contained"
+                style={{
+                  borderRadius: 55,
+                  backgroundColor: "#83BCA9",
+                }}
+                type="submit"
+              >
+                Next Step
+              </Button>
+            </Box>
+          </Form>
+        </div>
+      </Container>
+    </div>
   );
 }
 

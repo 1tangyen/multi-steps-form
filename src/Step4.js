@@ -1,127 +1,88 @@
 import React from "react";
-import {
-  Container,
-  Button,
-  Typography,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
-const StyledInfo = ({ label, value }) => (
-  <TableRow>
-    <TableCell variant="head">
-      <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
-        {label}
-      </Typography>
-    </TableCell>
-    <TableCell>
-      <Typography variant="body1">{value}</Typography>
-    </TableCell>
-  </TableRow>
-);
+function Step4({ formData, handleBack, fullQuery, dateData }) {
+  // Check if the dateData property exists in formData before accessing startDate
+  const startDate = formData.dateData ? formData.dateData.startDate : "N/A";
+  const endDate = formData.dateData ? formData.dateData.endDate : "N/A";
 
-function Step4({ formData, handleBack, fullQuery }) {
-  const handleConfirm = () => {
-    console.log("Confirmed");
-    console.log("Selected Queries:");
-    console.log("Start Date:", formData.dateData.dateData.startDate);
-    console.log("End Date:", formData.dateData.dateData.endDate);
-    console.log(
-      "Previous Start Date:",
-      formData.dateData.dateData.prevStartDate
-    );
-    console.log("Previous End Date:", formData.dateData.dateData.prevEndDate);
-    console.log("Full Names:", fullQuery.fullNames.join(", "));
-    console.log("Restaurants:", fullQuery.restaurants.join(", "));
-    console.log("Tried:", fullQuery.tried.join(", "));
-    console.log("Country:", fullQuery.country.join(", "));
-    console.log("City:", fullQuery.city.join(", "));
-  };
+  // Check if selectedCountry and selectedCity arrays are empty
+  const selectedCountries =
+    formData.selectedCountry.length > 0
+      ? formData.selectedCountry.map((country) => country.label).join(", ")
+      : "N/A";
+  const selectedCities =
+    formData.selectedCity.length > 0
+      ? formData.selectedCity.map((city) => city.label).join(", ")
+      : "N/A";
+  // Check if selectedFullNames, selectedRestaurants, and selectedTried arrays are empty
+  const selectedFullNames =
+    formData.fullNames.length > 0
+      ? formData.fullNames.map((fullName) => fullName.label).join(", ")
+      : "N/A";
+
+  const selectedRestaurants =
+    formData.restaurants.length > 0
+      ? formData.restaurants.map((restaurant) => restaurant.label).join(", ")
+      : "N/A";
+
+  const selectedTried =
+    formData.tried.length > 0
+      ? formData.tried.map((tried) => tried.label).join(", ")
+      : "N/A";
+
   return (
-    <Container>
-      <Paper elevation={3} style={{ padding: "2rem" }}>
-        <Typography
-          variant="h4"
-          style={{ color: "#83BCA9", marginBottom: "1rem" }}
+    <div>
+      <Typography variant="body1" paragraph>
+        Please review your selections before submitting.
+      </Typography>
+
+      {dateData.prevStartDate && dateData.prevEndDate && (
+        <Box>
+          <Typography variant="subtitle1">Previous Dates:</Typography>
+          <ul>
+            <li> Selected Start Date: {startDate}</li>
+            <li> Selected End Date: {endDate}</li>
+            <li>Previous Start Date: {dateData.prevStartDate}</li>
+            <li>Previous End Date: {dateData.prevEndDate}</li>
+          </ul>
+        </Box>
+      )}
+      <Typography variant="body1" paragraph>
+        Selected Countries: {selectedCountries}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        Selected Cities: {selectedCities}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        Selected Full Names: {selectedFullNames}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        Selected Restaurants: {selectedRestaurants}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        Selected Tried Options: {selectedTried}
+      </Typography>
+
+      {/* Rest of your confirmation content */}
+
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          // Handle your form submission logic here
+          onClick={() => {
+            // Handle form submission here
+          }}
+          style={{
+            borderRadius: 55,
+            backgroundColor: "#83BCA9",
+          }}
         >
-          Step 4: Review and Confirm
-        </Typography>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell variant="head">Field</TableCell>
-                <TableCell variant="head">Value</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <StyledInfo
-                label="Start Date:"
-                value={formData.dateData.dateData.startDate}
-              />
-              <StyledInfo
-                label="End Date:"
-                value={formData.dateData.dateData.endDate}
-              />
-              <StyledInfo
-                label="Previous Start Date:"
-                value={formData.dateData.dateData.prevStartDate}
-              />
-              <StyledInfo
-                label="Previous End Date:"
-                value={formData.dateData.dateData.prevEndDate}
-              />
-              <StyledInfo
-                label="Full Names:"
-                value={fullQuery.fullNames.join(", ")}
-              />
-              <StyledInfo
-                label="Restaurants:"
-                value={fullQuery.restaurants.join(", ")}
-              />
-              <StyledInfo label="Tried:" value={fullQuery.tried.join(", ")} />
-              <StyledInfo
-                label="Country:"
-                value={fullQuery.country.join(", ")}
-              />
-              <StyledInfo label="City:" value={fullQuery.city.join(", ")} />
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <div style={{ marginTop: "2rem" }}>
-          <Button
-            variant="outlined"
-            onClick={() => {
-              handleBack();
-            }}
-            style={{
-              borderRadius: 55,
-              borderColor: "#83BCA9",
-              color: "#83BCA9",
-            }}
-          >
-            Back
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirm}
-            style={{
-              borderRadius: 55,
-              backgroundColor: "#83BCA9",
-              color: "#fff",
-              marginLeft: "1rem",
-            }}
-          >
-            Confirm
-          </Button>
-        </div>
-      </Paper>
-    </Container>
+          Submit
+        </Button>
+      </Box>
+    </div>
   );
 }
 
